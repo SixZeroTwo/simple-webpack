@@ -1,0 +1,18 @@
+(function (fileMapFunction) {
+function require(filePath) {
+const fn = fileMapFunction[filePath]
+const module = {
+exports: {}
+}
+fn(require, module)
+return module.exports
+}
+//入口
+require('./main.js')
+})({
+<% data.forEach(info=>{ %>
+  '<%- info.filePath %>': function (require, module) {
+    <%- info.code; %>
+      },
+      <%}) %>
+        });

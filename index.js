@@ -2,6 +2,8 @@ import fs from 'fs'
 import parser from '@babel/parser'
 import traverse from '@babel/traverse'
 import path from 'path'
+import ejs from 'ejs'
+import { transformFromAst } from 'babel-core'
 function createAsset(filePath) {
   //读取文件内容，解码成字符串
   const source = fs.readFileSync(filePath, {
@@ -15,9 +17,11 @@ function createAsset(filePath) {
       deps.push(path.node.source.value)
     }
   })
+
+  const { code } = transformFromAst(ast, null, { presets: ["env"] })
   return {
     filePath,
-    source,
+    code,
     deps
   }
 }
@@ -38,3 +42,17 @@ function createGraph() {
 }
 
 const graph = createGraph()
+
+function build(graph) {
+  const template = fs.readFileSync('bundle.ejs', { encoding: 'utf-8' })
+  const data = graph.map(asset => {
+    return {
+      filePath: asset.filePath,
+      code: asset.code,
+    }
+  })
+  const code = ejs.render(template, { data })
+  fs.writeFileSync('./dist/bundle.js', code)
+}
+
+build(graph)
