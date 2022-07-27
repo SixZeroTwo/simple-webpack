@@ -4,6 +4,7 @@ import traverse from '@babel/traverse'
 import path from 'path'
 import ejs from 'ejs'
 import { transformFromAst } from 'babel-core'
+let id = 1
 function createAsset(filePath) {
   //读取文件内容，解码成字符串
   const source = fs.readFileSync(filePath, {
@@ -22,7 +23,9 @@ function createAsset(filePath) {
   return {
     filePath,
     code,
-    deps
+    deps,
+    id: id++,
+    mapping: {}
   }
 }
 
@@ -34,10 +37,10 @@ function createGraph() {
     const relativePaths = asset.deps
     for (let relativePath of relativePaths) {
       const child = createAsset(path.resolve('./examples/', relativePath))
+      asset.mapping[relativePath] = child.id
       queue.push(child)
     }
   }
-
   return queue
 }
 
@@ -45,10 +48,13 @@ const graph = createGraph()
 
 function build(graph) {
   const template = fs.readFileSync('bundle.ejs', { encoding: 'utf-8' })
+
   const data = graph.map(asset => {
     return {
       filePath: asset.filePath,
       code: asset.code,
+      id: asset.id,
+      mapping: asset.mapping,
     }
   })
   const code = ejs.render(template, { data })

@@ -1,18 +1,25 @@
 (function (fileMapFunction) {
-function require(filePath) {
-const fn = fileMapFunction[filePath]
+function require(id) {
+const fn = fileMapFunction[id][0]
+const map = fileMapFunction[id][1]
 const module = {
 exports: {}
 }
-fn(require, module)
+const localRequire = function (filePath) {
+const localId = map[filePath]
+return require(localId)
+}
+fn(localRequire, module,module.exports)
 return module.exports
 }
 //入口
-require('./main.js')
+require(1)
 })({
 <% data.forEach(info=>{ %>
-  '<%- info.filePath %>': function (require, module) {
+  <%- info.id %>: [function (require, module,exports) {
     <%- info.code; %>
       },
-      <%}) %>
-        });
+      <%- JSON.stringify(info.mapping) %>
+        ],
+        <%}) %>
+          });

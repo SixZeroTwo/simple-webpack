@@ -1,27 +1,35 @@
 (function (fileMapFunction) {
-  function require(filePath) {
-    const fn = fileMapFunction[filePath]
+  function require(id) {
+    const fn = fileMapFunction[id][0]
+    const map = fileMapFunction[id][1]
     const module = {
       exports: {}
     }
-    fn(require, module)
+
+    const localRequire = function (filePath) {
+      const localId = map[filePath]
+      return require(localId)
+    }
+    fn(localRequire, module)
     return module.exports
   }
   //入口
-  require('./main.js')
+  require(1)
 })({
-  './foo.js': function foojs(require, module) {
+  1: [function mainjs(require, module) {
+    const { foo } = require('./foo.js')
+
+    console.log('main');
+    foo()
+  }, {
+    './foo.js': 2
+  }],
+  2: [function foojs(require, module) {
     function foo() {
       console.log('foo');
     }
     module.exports = {
       foo
     }
-  },
-  './main.js': function mainjs(require, module) {
-    const { foo } = require('./foo.js')
-
-    console.log('main');
-    foo()
-  }
+  }, {}],
 })

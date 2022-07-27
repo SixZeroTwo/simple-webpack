@@ -1,38 +1,45 @@
 (function (fileMapFunction) {
-  function require(filePath) {
-    const fn = fileMapFunction[filePath]
-    const module = {
-      exports: {}
-    }
-    fn(require, module)
-    return module.exports
-  }
-  //入口
-  require('./main.js')
+function require(id) {
+const fn = fileMapFunction[id][0]
+const map = fileMapFunction[id][1]
+const module = {
+exports: {}
+}
+const localRequire = function (filePath) {
+const localId = map[filePath]
+return require(localId)
+}
+fn(localRequire, module,module.exports)
+return module.exports
+}
+//入口
+require(1)
 })({
 
-  './examples/main.js': function (require, module) {
+  1: [function (require, module,exports) {
     "use strict";
 
-    var _foo = require("./foo.js");
+var _foo = require("./foo.js");
 
-    var _foo2 = _interopRequireDefault(_foo);
-
-    function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-    console.log('main');
-    (0, _foo2.default)();
-  },
-  'C:\Users\Administrator\Desktop\自学前端\webpack\simple-webpack\examples\foo.js': function (require, module) {
+console.log('main');
+(0, _foo.foo)();
+      },
+      {"./foo.js":2}
+        ],
+        
+  2: [function (require, module,exports) {
     "use strict";
 
-    Object.defineProperty(exports, "__esModule", {
-      value: true
-    });
-    exports.foo = foo;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.foo = foo;
 
-    function foo() {
-      console.log('foo');
-    }
-  }
-})
+function foo() {
+  console.log('foo');
+}
+      },
+      {}
+        ],
+        
+          });
