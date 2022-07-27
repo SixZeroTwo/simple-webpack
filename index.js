@@ -4,11 +4,28 @@ import traverse from '@babel/traverse'
 import path from 'path'
 import ejs from 'ejs'
 import { transformFromAst } from 'babel-core'
+import webPackConfig from './webpack.config.js'
 let id = 1
+
 function createAsset(filePath) {
   //读取文件内容，解码成字符串
-  const source = fs.readFileSync(filePath, {
+  let source = fs.readFileSync(filePath, {
     encoding: 'utf-8'
+  })
+
+  //使用loader对匹配的文件进行转换
+  const rules = webPackConfig.module.rules
+  rules.forEach(({ test, use }) => {
+    if (test.test(filePath)) {
+      if (Array.isArray(use)) {
+        use.forEach((loader) => {
+          source = loader(source)
+        })
+      }
+      else if (typeof use == 'function') {
+        source = use(source)
+      }
+    }
   })
   //将文件内容转换成抽象语法树
   const ast = parser.parse(source, { sourceType: 'module' })
