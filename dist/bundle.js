@@ -35,9 +35,28 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.foo = foo;
 
+var _info = require("./info.json");
+
+var _info2 = _interopRequireDefault(_info);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function foo() {
   console.log('foo');
 }
+
+console.log(_info2.default);
+      },
+      {"./info.json":3}
+        ],
+        
+  3: [function (require, module,exports) {
+    "use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = "{\r\n  \"name\": \"ZhuZhu\",\r\n  \"age\": \"23\"\r\n}";
       },
       {}
         ],

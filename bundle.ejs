@@ -17,9 +17,9 @@ require(1)
 })({
 <% data.forEach(info=>{ %>
   <%- info.id %>: [function (require, module,exports) {
-    <%- info.code; %>
+    <%- info.code %>
       },
       <%- JSON.stringify(info.mapping) %>
         ],
-        <%}) %>
+        <%}); %>
           });

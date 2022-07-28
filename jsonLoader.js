@@ -1,3 +1,3 @@
-export function jsonLoader(source) {
-  return `exports default ${JSON.stringify(source)}`
+export function nodejsonLoader(source) {
+  return `export default ${JSON.stringify(source)}`
 }

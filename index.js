@@ -18,7 +18,7 @@ function createAsset(filePath) {
   rules.forEach(({ test, use }) => {
     if (test.test(filePath)) {
       if (Array.isArray(use)) {
-        use.forEach((loader) => {
+        use.reverse().forEach((loader) => {
           source = loader(source)
         })
       }
