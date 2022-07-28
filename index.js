@@ -5,8 +5,22 @@ import path from 'path'
 import ejs from 'ejs'
 import { transformFromAst } from 'babel-core'
 import webPackConfig from './webpack.config.js'
+import { SyncHook } from 'tapable'
+import webpackConfig from './webpack.config.js'
 let id = 1
 
+
+const hooks = {
+  emitOutputPath: new SyncHook(['compiler']),
+}
+//初始化插件
+initPlugins()
+function initPlugins() {
+  const plugins = webpackConfig.plugins
+  for (let plugin of plugins) {
+    plugin.apply(hooks)
+  }
+}
 function createAsset(filePath) {
   //读取文件内容，解码成字符串
   let source = fs.readFileSync(filePath, {
@@ -75,7 +89,14 @@ function build(graph) {
     }
   })
   const code = ejs.render(template, { data })
-  fs.writeFileSync('./dist/bundle.js', code)
+  let outputPath = './dist/bundle.js'
+  const compiler = {
+    changeOutputPath(output) {
+      outputPath = output
+    }
+  }
+  hooks.emitOutputPath.call(compiler)
+  fs.writeFileSync(outputPath, code)
 }
 
 build(graph)
